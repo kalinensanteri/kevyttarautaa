@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trophy, Plus, X } from 'lucide-react'
+import { Plus, X, Trophy } from 'lucide-react'
 import { benchmarkSchedule } from '../data/program'
 import type { AppState, BenchmarkResult } from '../types'
 
@@ -18,87 +18,73 @@ export function Benchmarks({ state, actions }: Props) {
   const { benchmarkResults, currentWeek } = state
 
   function getResultsFor(wodName: string) {
-    return benchmarkResults.filter(r =>
-      r.wodName.toLowerCase().includes(wodName.toLowerCase())
-    ).sort((a, b) => a.date.localeCompare(b.date))
+    return benchmarkResults
+      .filter(r => r.wodName.toLowerCase().includes(wodName.toLowerCase()))
+      .sort((a, b) => a.date.localeCompare(b.date))
   }
 
   function submit() {
     if (!formWod || !formResult) return
     actions.addBenchmark({
-      wodName: formWod,
-      result: formResult,
-      rx: formRx,
+      wodName: formWod, result: formResult, rx: formRx,
       notes: formNotes || undefined,
       date: new Date().toISOString().slice(0, 10),
     })
-    setFormWod('')
-    setFormResult('')
-    setFormNotes('')
-    setShowForm(false)
+    setFormWod(''); setFormResult(''); setFormNotes(''); setShowForm(false)
   }
 
   return (
-    <div className="pb-24 px-4 pt-4 space-y-5">
+    <div className="pb-24 px-4 pt-5 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-white">Benchmarks</h1>
         <button
           onClick={() => setShowForm(f => !f)}
-          className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-400 text-white text-sm font-medium px-3 py-2 rounded-xl transition-colors"
+          className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-xl transition-all ${
+            showForm
+              ? 'border border-white/15 text-white/50'
+              : 'bg-white text-black hover:bg-white/90'
+          }`}
         >
-          {showForm ? <X size={16} /> : <Plus size={16} />}
-          {showForm ? 'Cancel' : 'Log result'}
+          {showForm ? <><X size={15} /> Cancel</> : <><Plus size={15} /> Log result</>}
         </button>
       </div>
 
       {/* Log form */}
       {showForm && (
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-slate-300">Log a benchmark result</h2>
-          <input
-            placeholder="WOD name (e.g. Fran, Helen, Grace)"
-            value={formWod}
-            onChange={e => setFormWod(e.target.value)}
-            className="w-full bg-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-          />
-          <input
-            placeholder="Result (e.g. 8:32, 12 rounds, 52.5 kg)"
-            value={formResult}
-            onChange={e => setFormResult(e.target.value)}
-            className="w-full bg-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-          />
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formRx}
-                onChange={e => setFormRx(e.target.checked)}
-                className="accent-orange-500"
-              />
-              Rx
-            </label>
-          </div>
-          <input
-            placeholder="Notes (optional)"
-            value={formNotes}
-            onChange={e => setFormNotes(e.target.value)}
-            className="w-full bg-slate-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
-          />
+        <div className="glass p-4 space-y-3">
+          <p className="text-[10px] uppercase tracking-widest text-white/30">Log a result</p>
+          {[
+            { placeholder: 'WOD name (e.g. Fran, Helen, Grace)', value: formWod, set: setFormWod },
+            { placeholder: 'Result (e.g. 8:32, 12 rounds)', value: formResult, set: setFormResult },
+            { placeholder: 'Notes (optional)', value: formNotes, set: setFormNotes },
+          ].map(({ placeholder, value, set }) => (
+            <input
+              key={placeholder}
+              placeholder={placeholder}
+              value={value}
+              onChange={e => set(e.target.value)}
+              className="glass-input w-full"
+              style={{ textAlign: 'left', padding: '10px 12px' }}
+            />
+          ))}
+          <label className="flex items-center gap-2 text-sm text-white/40 cursor-pointer">
+            <input type="checkbox" checked={formRx} onChange={e => setFormRx(e.target.checked)} className="accent-white" />
+            Rx
+          </label>
           <button
             onClick={submit}
-            className="w-full bg-orange-500 hover:bg-orange-400 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors"
+            className="w-full bg-white text-black font-bold py-2.5 rounded-xl text-sm hover:bg-white/90 transition-all"
           >
             Save result
           </button>
         </div>
       )}
 
-      {/* Scheduled benchmark tests */}
+      {/* Schedule */}
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-300">Benchmark Testing Schedule</h2>
+        <p className="text-[10px] uppercase tracking-widest text-white/30">Testing Schedule</p>
         {benchmarkSchedule.map(b => {
           const isPast = currentWeek > b.week
-          const isUpcoming = currentWeek <= b.week
           const weeksUntil = b.week - currentWeek
           const logged = b.wods.some(wod => getResultsFor(wod.split(' ')[0]).length > 0)
 
@@ -107,26 +93,22 @@ export function Benchmarks({ state, actions }: Props) {
               key={b.week}
               className={`rounded-2xl border p-4 transition-all ${
                 logged
-                  ? 'border-green-500/40 bg-green-500/5'
+                  ? 'border-white/20 bg-white/6'
                   : isPast
-                  ? 'border-slate-700/50 bg-slate-900/50 opacity-60'
-                  : 'border-slate-700 bg-slate-900'
+                  ? 'border-white/5 bg-white/1 opacity-45'
+                  : 'border-white/8 bg-white/3'
               }`}
             >
               <div className="flex items-start justify-between gap-2 mb-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-slate-400">Week {b.week}</span>
-                    {logged && <span className="text-[10px] text-green-400 font-bold">✓ LOGGED</span>}
-                    {!logged && isUpcoming && weeksUntil > 0 && (
-                      <span className="text-[10px] text-orange-400">{weeksUntil} wks away</span>
-                    )}
-                    {!logged && isUpcoming && weeksUntil === 0 && (
-                      <span className="text-[10px] text-orange-400 font-bold">THIS WEEK</span>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold text-white/35 border border-white/10 rounded px-1.5 py-0.5">
+                    Wk {b.week}
+                  </span>
+                  {logged && <span className="text-[10px] text-white/50 font-bold">✓ logged</span>}
+                  {!logged && weeksUntil === 0 && <span className="text-[10px] text-white font-bold">this week</span>}
+                  {!logged && weeksUntil > 0 && <span className="text-[10px] text-white/25">{weeksUntil}w away</span>}
                 </div>
-                {logged && <Trophy size={16} className="text-yellow-500 shrink-0" />}
+                {logged && <Trophy size={14} className="text-white/40 shrink-0" />}
               </div>
 
               <div className="space-y-1 mb-2">
@@ -134,39 +116,40 @@ export function Benchmarks({ state, actions }: Props) {
                   const results = getResultsFor(wod.split(' ')[0])
                   return (
                     <div key={j} className="flex items-center justify-between text-sm">
-                      <span className="text-slate-300 font-medium">{wod}</span>
+                      <span className="text-white/60 font-medium">{wod}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-slate-500">target: {b.targets[j]}</span>
+                        <span className="text-[11px] text-white/20">{b.targets[j]}</span>
                         {results.length > 0 && (
-                          <span className="text-[11px] text-orange-300 font-bold">{results[results.length - 1].result}</span>
+                          <span className="text-[11px] text-white font-bold">{results[results.length - 1].result}</span>
                         )}
                       </div>
                     </div>
                   )
                 })}
               </div>
-
-              <p className="text-[11px] text-slate-500 italic">{b.notes}</p>
+              <p className="text-[11px] text-white/20 italic">{b.notes}</p>
             </div>
           )
         })}
       </div>
 
-      {/* All logged results */}
+      {/* All results */}
       {benchmarkResults.length > 0 && (
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-4">
-          <h2 className="text-sm font-semibold text-slate-300 mb-3">All Results</h2>
-          <div className="space-y-2">
+        <div className="glass p-4">
+          <p className="text-[10px] uppercase tracking-widest text-white/30 mb-3">All Results</p>
+          <div className="space-y-0">
             {[...benchmarkResults].reverse().map((r, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-slate-800 last:border-0">
+              <div key={i} className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-0">
                 <div>
                   <p className="text-sm font-medium text-white flex items-center gap-1.5">
                     {r.wodName}
-                    {r.rx && <span className="text-[10px] bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded px-1">Rx</span>}
+                    {r.rx && (
+                      <span className="text-[10px] border border-white/15 text-white/40 rounded px-1 font-normal">Rx</span>
+                    )}
                   </p>
-                  <p className="text-[11px] text-slate-500">{r.date}{r.notes ? ` · ${r.notes}` : ''}</p>
+                  <p className="text-[11px] text-white/25">{r.date}{r.notes ? ` · ${r.notes}` : ''}</p>
                 </div>
-                <p className="text-base font-bold text-white">{r.result}</p>
+                <p className="text-base font-bold text-white tabular-nums">{r.result}</p>
               </div>
             ))}
           </div>

@@ -23,13 +23,12 @@ const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satu
 
 export function Today({ state, actions }: Props) {
   const [timerSeconds, setTimerSeconds] = useState<number | null>(null)
-
   const { currentWeek, currentDay } = state
   const workout = block1Workouts.find(w => w.week === currentWeek && w.day === currentDay)
 
   if (!workout) return (
-    <div className="p-6 text-center text-slate-400">
-      <p>No workout found for Week {currentWeek}, Day {currentDay}.</p>
+    <div className="p-6 text-center text-white/30">
+      <p>No workout for Week {currentWeek}, Day {currentDay}.</p>
     </div>
   )
 
@@ -55,20 +54,20 @@ export function Today({ state, actions }: Props) {
 
   return (
     <div className="pb-24">
-      {/* Week/day selector */}
-      <div className="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+      {/* Sticky header */}
+      <div className="sticky top-0 z-30 glass-nav px-4 py-3">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate(-1)} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
-            <ChevronLeft size={20} />
+          <button onClick={() => navigate(-1)} className="p-1.5 rounded-xl border border-white/10 text-white/40 hover:text-white/70 transition-colors">
+            <ChevronLeft size={18} />
           </button>
           <div className="text-center">
-            <p className="text-xs text-slate-500">
-              Week {currentWeek} · Block 1{workout.isDeload ? ' · 🔄 DELOAD' : ''}
+            <p className="text-[11px] text-white/30 uppercase tracking-widest">
+              Week {currentWeek} · Block 1{workout.isDeload ? ' · Deload' : ''}
             </p>
             <p className="text-base font-semibold text-white">{DAY_NAMES[currentDay - 1]}</p>
           </div>
-          <button onClick={() => navigate(1)} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
-            <ChevronRight size={20} />
+          <button onClick={() => navigate(1)} className="p-1.5 rounded-xl border border-white/10 text-white/40 hover:text-white/70 transition-colors">
+            <ChevronRight size={18} />
           </button>
         </div>
 
@@ -77,18 +76,17 @@ export function Today({ state, actions }: Props) {
           {WEEKDAYS.map((wd, i) => {
             const d = i + 1
             const isToday = d === currentDay
-            const wLog = state.workoutLogs[`w${currentWeek}d${d}`]
-            const isDone = !!wLog?.completedAt
+            const isDone = !!state.workoutLogs[`w${currentWeek}d${d}`]?.completedAt
             return (
               <button
                 key={wd}
                 onClick={() => actions.setCurrentWorkout(currentWeek, d)}
                 className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                   isToday
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-white text-black'
                     : isDone
-                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    ? 'border border-white/20 text-white/50'
+                    : 'border border-white/8 text-white/25 hover:border-white/20 hover:text-white/50'
                 }`}
               >
                 {wd}
@@ -98,34 +96,37 @@ export function Today({ state, actions }: Props) {
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-4">
+      <div className="px-4 pt-4 space-y-3">
         {/* Workout header card */}
-        <div className={`rounded-2xl p-4 ${workout.isDeload ? 'bg-teal-900/30 border border-teal-500/30' : 'bg-slate-800/60 border border-slate-700'}`}>
+        <div className="glass p-4">
           <div className="flex items-start justify-between gap-2 mb-3">
-            <div>
+            <div className="flex-1">
               {workout.isDeload && (
-                <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-400 bg-teal-500/15 border border-teal-500/30 rounded-full px-2 py-0.5 mb-2">
-                  Deload Week
+                <span className="inline-block text-[10px] font-semibold uppercase tracking-widest text-white/40 border border-white/12 rounded-full px-2 py-0.5 mb-2">
+                  Deload
                 </span>
               )}
               <h2 className="text-white font-bold text-base leading-snug">{workout.focus}</h2>
             </div>
-            <div className="flex items-center gap-1 text-slate-400 shrink-0">
-              <Clock size={14} />
+            <div className="flex items-center gap-1.5 text-white/30 shrink-0 mt-0.5">
+              <Clock size={13} />
               <span className="text-sm">{workout.duration} min</span>
             </div>
           </div>
 
-          {/* Progress bar */}
           {isStarted && (
-            <div>
-              <div className="flex justify-between text-xs text-slate-500 mb-1">
-                <span>{completedSections}/{totalSections} sections done</span>
-                {isFinished && <span className="text-green-400 font-medium flex items-center gap-1"><CheckCircle2 size={12} /> Complete</span>}
+            <div className="mb-3">
+              <div className="flex justify-between text-[11px] text-white/30 mb-1.5">
+                <span>{completedSections}/{totalSections} sections</span>
+                {isFinished && (
+                  <span className="text-white/60 flex items-center gap-1">
+                    <CheckCircle2 size={11} /> Complete
+                  </span>
+                )}
               </div>
-              <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-px bg-white/8 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-orange-500 rounded-full transition-all duration-500"
+                  className="h-full bg-white rounded-full transition-all duration-500"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
@@ -135,27 +136,27 @@ export function Today({ state, actions }: Props) {
           {!isStarted && (
             <button
               onClick={() => actions.startWorkout(workout.id)}
-              className="w-full mt-1 py-2.5 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-2.5 bg-white text-black font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:bg-white/90 active:scale-[0.98]"
             >
-              <Zap size={16} /> Start workout
+              <Zap size={15} /> Start workout
             </button>
           )}
 
           {isStarted && !isFinished && completedSections === totalSections && (
             <button
               onClick={() => actions.finishWorkout(workout.id)}
-              className="w-full mt-3 py-2.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors"
+              className="w-full mt-1 py-2.5 bg-white text-black font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:bg-white/90"
             >
-              <CheckCircle2 size={16} /> Finish workout
+              <CheckCircle2 size={15} /> Finish workout
             </button>
           )}
 
           {isFinished && (
             <button
               onClick={() => actions.startWorkout(workout.id)}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors mt-2"
+              className="flex items-center gap-1 text-[11px] text-white/25 hover:text-white/50 transition-colors mt-1"
             >
-              <RotateCcw size={12} /> Re-open workout
+              <RotateCcw size={11} /> Re-open
             </button>
           )}
         </div>
@@ -180,7 +181,6 @@ export function Today({ state, actions }: Props) {
         ))}
       </div>
 
-      {/* Rest timer */}
       {timerSeconds !== null && (
         <RestTimer
           seconds={timerSeconds}
