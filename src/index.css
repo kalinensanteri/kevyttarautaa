@@ -24,10 +24,11 @@ body::after {
   height: 200%;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.055;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-  background-size: 300px 300px;
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
 }
 
 #root {
@@ -40,43 +41,66 @@ body::after {
 .glass {
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.085) 0%,
-    rgba(255, 255, 255, 0.042) 100%
+    rgba(255, 255, 255, 0.028) 0%,
+    rgba(255, 255, 255, 0.008) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-top-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  /* Chromatic border: warm red-pink top-left, cool blue bottom-right */
+  border-top: 1px solid rgba(255, 170, 160, 0.28);
+  border-left: 1px solid rgba(255, 150, 140, 0.16);
+  border-bottom: 1px solid rgba(140, 150, 255, 0.20);
+  border-right: 1px solid rgba(140, 150, 255, 0.24);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.10) inset,
-    0 16px 40px rgba(0, 0, 0, 0.55),
-    0 2px 8px rgba(0, 0, 0, 0.35);
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    /* RGB chromatic fringe */
+    -1px -1px 0 rgba(255, 55, 40, 0.28),
+    1px 1px 0 rgba(40, 55, 255, 0.28),
+    -2px -2px 8px rgba(255, 55, 40, 0.10),
+    2px 2px 8px rgba(40, 55, 255, 0.10),
+    /* depth */
+    0 16px 40px rgba(0, 0, 0, 0.60),
+    0 2px 8px rgba(0, 0, 0, 0.40);
   border-radius: 20px;
 }
 
 .glass-sm {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-top-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 150, 140, 0.18);
+  border-left: 1px solid rgba(255, 140, 130, 0.10);
+  border-bottom: 1px solid rgba(130, 140, 255, 0.14);
+  border-right: 1px solid rgba(130, 140, 255, 0.16);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    -1px -1px 0 rgba(255, 55, 40, 0.16),
+    1px 1px 0 rgba(40, 55, 255, 0.16);
   border-radius: 12px;
 }
 
 .glass-nav {
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(32px) saturate(160%);
   -webkit-backdrop-filter: blur(32px) saturate(160%);
   border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .glass-float {
-  background: linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-top-color: rgba(255,255,255,0.28);
+  background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-top: 1px solid rgba(255, 170, 160, 0.32);
+  border-left: 1px solid rgba(255, 150, 140, 0.18);
+  border-bottom: 1px solid rgba(140, 150, 255, 0.24);
+  border-right: 1px solid rgba(140, 150, 255, 0.28);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.12) inset,
-    0 24px 64px rgba(0,0,0,0.6),
-    0 4px 12px rgba(0,0,0,0.4);
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    /* RGB chromatic fringe — stronger on float */
+    -1px -1px 0 rgba(255, 55, 40, 0.36),
+    1px 1px 0 rgba(40, 55, 255, 0.36),
+    -3px -3px 12px rgba(255, 55, 40, 0.14),
+    3px 3px 12px rgba(40, 55, 255, 0.14),
+    0 24px 64px rgba(0,0,0,0.65),
+    0 4px 12px rgba(0,0,0,0.45);
   border-radius: 22px;
 }
 
