@@ -1,31 +1,43 @@
 import { useState, useCallback } from 'react'
-import type { AppState, WorkoutLog, SectionLog, SetLog, BenchmarkResult, MafEntry, WendlerTMs } from './types'
+import type {
+  AppState, Phase, SetLog, ExerciseLog, SessionLog, DayLog,
+  BodyWeightEntry, RunEntry, MetconEntry,
+} from './types'
+
+const today = new Date().toISOString().slice(0, 10)
 
 const DEFAULT_STATE: AppState = {
-  currentWeek: 1,
-  currentDay: 1,
-  workoutLogs: {},
-  wendlerTMs: { squat: 117, deadlift: 130, press: 50 },
-  dbBench: { load: 40, currentReps: 8, targetReps: 8 },
-  benchmarkResults: [],
-  mafLog: [],
-  activeRestTimer: null,
+  currentPhase: 1,
+  programStartDate: today,
+  viewDate: today,
+  dayLogs: {},
+  bodyWeightLog: [],
+  runLog: [],
+  metconLog: [],
+  restTimerEndsAt: null,
 }
 
 function loadState(): AppState {
   try {
-    const raw = localStorage.getItem('cf-tracker-state')
-    if (!raw) return DEFAULT_STATE
-    return { ...DEFAULT_STATE, ...JSON.parse(raw) }
+    const raw = localStorage.getItem('unit-tracker-state')
+    if (!raw) return { ...DEFAULT_STATE }
+    const saved = JSON.parse(raw)
+    return {
+      ...DEFAULT_STATE,
+      ...saved,
+      viewDate: today,        // always start on today
+      restTimerEndsAt: null,  // don't restore timer
+    }
   } catch {
-    return DEFAULT_STATE
+    return { ...DEFAULT_STATE }
   }
 }
 
 function saveState(state: AppState) {
   try {
-    const { activeRestTimer: _, ...toSave } = state
-    localStorage.setItem('cf-tracker-state', JSON.stringify(toSave))
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { viewDate: _v, restTimerEndsAt: _r, ...toSave } = state
+    localStorage.setItem('unit-tracker-state', JSON.stringify(toSave))
   } catch {}
 }
 
@@ -40,48 +52,41 @@ export function useAppStore() {
     })
   }, [])
 
-  function getLog(workoutId: string): WorkoutLog | undefined {
-    return state.workoutLogs[workoutId]
+  // ── Navigation ────────────────────────────────────────────────
+  function setViewDate(date: string) {
+    setState(prev => ({ ...prev, viewDate: date }))
   }
 
-  function startWorkout(workoutId: string) {
-    update(s => {
-      if (s.workoutLogs[workoutId]?.startedAt) return s
-      return {
-        ...s,
-        workoutLogs: {
-          ...s.workoutLogs,
-          [workoutId]: {
-            workoutId,
-            date: new Date().toISOString().slice(0, 10),
-            startedAt: new Date().toISOString(),
-            sections: {},
-          },
-        },
-      }
-    })
+  function setPhase(phase: Phase) {
+    update(s => ({ ...s, currentPhase: phase }))
   }
 
-  function completeSection(workoutId: string, sectionId: string) {
+  function setProgramStartDate(date: string) {
+    update(s => ({ ...s, programStartDate: date }))
+  }
+
+  // ── Session & exercise logging ────────────────────────────────
+  function getOrCreateDayLog(logs: AppState['dayLogs'], date: string): DayLog {
+    return logs[date] ?? { sessions: {} }
+  }
+
+  function getOrCreateSessionLog(dayLog: DayLog, sessionId: string): SessionLog {
+    return dayLog.sessions[sessionId] ?? { completed: false, exercises: {} }
+  }
+
+  function completeSession(date: string, sessionId: string) {
     update(s => {
-      const log = s.workoutLogs[workoutId] ?? {
-        workoutId,
-        date: new Date().toISOString().slice(0, 10),
-        startedAt: new Date().toISOString(),
-        sections: {},
-      }
+      const day = getOrCreateDayLog(s.dayLogs, date)
+      const session = getOrCreateSessionLog(day, sessionId)
       return {
         ...s,
-        workoutLogs: {
-          ...s.workoutLogs,
-          [workoutId]: {
-            ...log,
-            sections: {
-              ...log.sections,
-              [sectionId]: {
-                ...(log.sections[sectionId] ?? { sets: {} }),
-                completed: true,
-              },
+        dayLogs: {
+          ...s.dayLogs,
+          [date]: {
+            ...day,
+            sessions: {
+              ...day.sessions,
+              [sessionId]: { ...session, completed: !session.completed },
             },
           },
         },
@@ -89,28 +94,32 @@ export function useAppStore() {
     })
   }
 
-  function logSet(workoutId: string, sectionId: string, setIndex: number, setLog: SetLog) {
+  function logExerciseSet(
+    date: string,
+    sessionId: string,
+    exerciseName: string,
+    setIdx: number,
+    setLog: SetLog,
+  ) {
     update(s => {
-      const log = s.workoutLogs[workoutId] ?? {
-        workoutId,
-        date: new Date().toISOString().slice(0, 10),
-        startedAt: new Date().toISOString(),
-        sections: {},
-      }
-      const section: SectionLog = log.sections[sectionId] ?? { completed: false, sets: {} }
+      const day = getOrCreateDayLog(s.dayLogs, date)
+      const session = getOrCreateSessionLog(day, sessionId)
+      const exLog: ExerciseLog = session.exercises[exerciseName] ?? { sets: [] }
+      const newSets = [...exLog.sets]
+      newSets[setIdx] = setLog
       return {
         ...s,
-        workoutLogs: {
-          ...s.workoutLogs,
-          [workoutId]: {
-            ...log,
-            sections: {
-              ...log.sections,
-              [sectionId]: {
-                ...section,
-                sets: {
-                  ...section.sets,
-                  [setIndex]: setLog,
+        dayLogs: {
+          ...s.dayLogs,
+          [date]: {
+            ...day,
+            sessions: {
+              ...day.sessions,
+              [sessionId]: {
+                ...session,
+                exercises: {
+                  ...session.exercises,
+                  [exerciseName]: { sets: newSets },
                 },
               },
             },
@@ -120,61 +129,106 @@ export function useAppStore() {
     })
   }
 
-  function finishWorkout(workoutId: string) {
+  function logSessionRun(
+    date: string,
+    sessionId: string,
+    data: { min?: number; km?: number; hr?: number },
+  ) {
     update(s => {
-      const log = s.workoutLogs[workoutId]
-      if (!log) return s
+      const day = getOrCreateDayLog(s.dayLogs, date)
+      const session = getOrCreateSessionLog(day, sessionId)
       return {
         ...s,
-        workoutLogs: {
-          ...s.workoutLogs,
-          [workoutId]: { ...log, completedAt: new Date().toISOString() },
+        dayLogs: {
+          ...s.dayLogs,
+          [date]: {
+            ...day,
+            sessions: {
+              ...day.sessions,
+              [sessionId]: {
+                ...session,
+                runMin: data.min ?? session.runMin,
+                runKm: data.km ?? session.runKm,
+                runHr: data.hr ?? session.runHr,
+              },
+            },
+          },
         },
       }
     })
   }
 
-  function setCurrentWorkout(week: number, day: number) {
-    update(s => ({ ...s, currentWeek: week, currentDay: day }))
+  function logMetconResult(date: string, sessionId: string, result: string) {
+    update(s => {
+      const day = getOrCreateDayLog(s.dayLogs, date)
+      const session = getOrCreateSessionLog(day, sessionId)
+      return {
+        ...s,
+        dayLogs: {
+          ...s.dayLogs,
+          [date]: {
+            ...day,
+            sessions: {
+              ...day.sessions,
+              [sessionId]: { ...session, metconResult: result },
+            },
+          },
+        },
+      }
+    })
   }
 
-  function updateWendlerTMs(tms: Partial<WendlerTMs>) {
-    update(s => ({ ...s, wendlerTMs: { ...s.wendlerTMs, ...tms } }))
+  // ── Body weight ───────────────────────────────────────────────
+  function addBodyWeight(kg: number) {
+    const entry: BodyWeightEntry = { date: today, kg }
+    update(s => ({
+      ...s,
+      bodyWeightLog: [...s.bodyWeightLog.filter(e => e.date !== today), entry]
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    }))
   }
 
-  function updateDBBench(load: number, currentReps: number, targetReps: number) {
-    update(s => ({ ...s, dbBench: { load, currentReps, targetReps } }))
+  // ── Run log ───────────────────────────────────────────────────
+  function addRunEntry(entry: Omit<RunEntry, 'date'>) {
+    update(s => ({
+      ...s,
+      runLog: [...s.runLog, { ...entry, date: today }]
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    }))
   }
 
-  function addBenchmark(result: BenchmarkResult) {
-    update(s => ({ ...s, benchmarkResults: [...s.benchmarkResults, result] }))
+  // ── MetCon log ────────────────────────────────────────────────
+  function addMetconEntry(entry: Omit<MetconEntry, 'date'>) {
+    update(s => ({
+      ...s,
+      metconLog: [...s.metconLog, { ...entry, date: today }],
+    }))
   }
 
-  function addMafEntry(entry: MafEntry) {
-    update(s => ({ ...s, mafLog: [...s.mafLog, entry] }))
-  }
-
+  // ── Rest timer ────────────────────────────────────────────────
   function startRestTimer(seconds: number) {
-    update(s => ({ ...s, activeRestTimer: seconds }))
+    setState(prev => ({ ...prev, restTimerEndsAt: Date.now() + seconds * 1000 }))
   }
 
   function clearRestTimer() {
-    update(s => ({ ...s, activeRestTimer: null }))
+    setState(prev => ({ ...prev, restTimerEndsAt: null }))
   }
 
   return {
     state,
-    getLog,
-    startWorkout,
-    completeSection,
-    logSet,
-    finishWorkout,
-    setCurrentWorkout,
-    updateWendlerTMs,
-    updateDBBench,
-    addBenchmark,
-    addMafEntry,
-    startRestTimer,
-    clearRestTimer,
+    actions: {
+      setViewDate,
+      setPhase,
+      setProgramStartDate,
+      completeSession,
+      logExerciseSet,
+      logSessionRun,
+      logMetconResult,
+      addBodyWeight,
+      addRunEntry,
+      addMetconEntry,
+      startRestTimer,
+      clearRestTimer,
+    },
   }
 }

@@ -1,100 +1,72 @@
-export type SectionType =
-  | 'warmup'
-  | 'strength'
-  | 'technique'
-  | 'metcon'
-  | 'accessory'
-  | 'cooldown'
-  | 'conditioning'
-  | 'gymnastics'
+export type Phase = 1 | 2 | 3
 
-export type SetPrescription = {
-  setLabel: string
-  load?: string
-  reps: string
-  rest?: string
-  rpe?: string
-  notes?: string
-  isAmrap?: boolean
+export type SessionType = 'strength' | 'run' | 'intervals' | 'metcon' | 'gymnastics' | 'rest'
+
+export type Exercise = {
+  name: string
+  prescription: string   // "5×3–5", "40 min", "10×1/1 min"
+  notes: string
+  rest?: string          // "3 min", "90 sec"
+  trackLoad?: boolean
+  trackReps?: boolean
 }
 
-export type WorkoutSection = {
-  id: string
-  title: string
-  type: SectionType
-  duration?: string
-  note?: string
-  sets?: SetPrescription[]
-  coachNote?: string
-  isDescriptionOnly?: boolean
+export type WorkoutSession = {
+  id: string             // 'am' | 'pm' | 'long' | 'rest'
+  time: string           // 'Morning' | 'Evening' | 'All day'
+  label: string
+  type: SessionType
   description?: string
+  exercises: Exercise[]
 }
 
-export type Workout = {
-  id: string
-  week: number
-  day: number
-  weekday: string
-  focus: string
-  duration: number
-  isDeload?: boolean
-  sections: WorkoutSection[]
+export type DayPlan = {
+  dayNum: number         // 1=Mon … 7=Sun
+  name: string
+  subtitle: string
+  emphasis: string       // 'Evening only' | 'AM + PM' | 'Long effort' | 'Rest'
+  sessions: WorkoutSession[]
 }
 
-export type SetLog = {
-  load?: number
-  reps?: number
-  rpe?: number
-}
+export type SetLog = { load?: number; reps?: number; done?: boolean }
+export type ExerciseLog = { sets: (SetLog | undefined)[] }
 
-export type SectionLog = {
+export type SessionLog = {
   completed: boolean
-  sets: Record<number, SetLog>
-  notes?: string
+  exercises: Record<string, ExerciseLog>
+  metconResult?: string
+  runMin?: number
+  runKm?: number
+  runHr?: number
 }
 
-export type WorkoutLog = {
-  workoutId: string
+export type DayLog = {
+  sessions: Record<string, SessionLog>
+}
+
+export type BodyWeightEntry = { date: string; kg: number }
+export type RunEntry = {
   date: string
-  startedAt?: string
-  completedAt?: string
-  sections: Record<string, SectionLog>
+  durationMin: number
+  distanceKm?: number
+  avgHr?: number
+  type: 'zone2' | 'long' | 'intervals'
 }
-
-export type WendlerTMs = {
-  squat: number
-  deadlift: number
-  press: number
-}
-
-export type DBBenchProgress = {
-  load: number
-  currentReps: number
-  targetReps: number
-}
-
-export type BenchmarkResult = {
-  wodName: string
+export type MetconEntry = {
   date: string
+  name: string
   result: string
   rx: boolean
   notes?: string
 }
 
-export type MafEntry = {
-  date: string
-  paceSeconds: number
-  avgHr: number
-  distanceM?: number
-}
-
 export type AppState = {
-  currentWeek: number
-  currentDay: number
-  workoutLogs: Record<string, WorkoutLog>
-  wendlerTMs: WendlerTMs
-  dbBench: DBBenchProgress
-  benchmarkResults: BenchmarkResult[]
-  mafLog: MafEntry[]
-  activeRestTimer: number | null
+  currentPhase: Phase
+  programStartDate: string
+  viewDate: string
+  dayLogs: Record<string, DayLog>
+  bodyWeightLog: BodyWeightEntry[]
+  runLog: RunEntry[]
+  metconLog: MetconEntry[]
+  restTimerEndsAt: number | null
 }

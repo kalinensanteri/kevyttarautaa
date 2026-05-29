@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Dumbbell, TrendingUp, Calendar, Trophy } from 'lucide-react'
+import { Dumbbell, TrendingUp, Calendar, Flame } from 'lucide-react'
 
 const tabs = [
-  { to: '/',            icon: Dumbbell,   label: 'Today' },
-  { to: '/progress',    icon: TrendingUp, label: 'Progress' },
-  { to: '/program',     icon: Calendar,   label: 'Program' },
-  { to: '/benchmarks',  icon: Trophy,     label: 'Benchmarks' },
+  { to: '/',         icon: Dumbbell,   label: 'Today'   },
+  { to: '/progress', icon: TrendingUp, label: 'Progress' },
+  { to: '/program',  icon: Calendar,   label: 'Program'  },
+  { to: '/fuel',     icon: Flame,      label: 'Fuel'     },
 ]
 
 export function BottomNav() {
