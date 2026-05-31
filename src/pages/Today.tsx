@@ -18,7 +18,7 @@ type Props = {
   }
 }
 
-const DAY_ABBR = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+const DAY_ABBR = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
 function fmtDate(date: string) {
   return new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })

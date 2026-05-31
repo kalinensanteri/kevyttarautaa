@@ -182,19 +182,20 @@ export const WEEKLY_SCHEDULE: DayPlan[] = [
 ]
 
 export function getDayPlan(date: string): DayPlan {
-  const dow = new Date(date).getDay() // 0=Sun
-  const dayNum = dow === 0 ? 7 : dow
+  // Training week starts on Sunday: Sun=dayNum1(Mon workout), Mon=2, …, Sat=7(Rest)
+  const dow = new Date(date).getDay() // 0=Sun … 6=Sat
+  const dayNum = dow + 1              // Sun→1, Mon→2, …, Sat→7
   return WEEKLY_SCHEDULE.find(d => d.dayNum === dayNum) ?? WEEKLY_SCHEDULE[6]
 }
 
 export function getWeekDates(date: string): string[] {
+  // Week runs Sun → Sat to match the training cycle
   const d = new Date(date)
-  const dow = d.getDay() === 0 ? 7 : d.getDay()
-  const monday = new Date(d)
-  monday.setDate(d.getDate() - (dow - 1))
+  const sunday = new Date(d)
+  sunday.setDate(d.getDate() - d.getDay()) // rewind to Sun
   return Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(monday)
-    day.setDate(monday.getDate() + i)
+    const day = new Date(sunday)
+    day.setDate(sunday.getDate() + i)
     return day.toISOString().slice(0, 10)
   })
 }

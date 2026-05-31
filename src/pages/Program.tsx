@@ -27,7 +27,7 @@ const SESSION_LABEL: Record<string, string> = {
   rest:       'Rest',
 }
 
-const DAY_NAMES = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+const DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
 export function Program({ state, actions }: Props) {
   const { currentPhase } = state
