@@ -1,18 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f97316" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="OPERATOR" />
-    <title>OPERATOR CrossFit</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meal — Build Your Order</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <section class="view view-landing active" id="viewLanding">
+      <img class="landing-mascot" src="gs.svg" alt="A guy in a trenchcoat holding a sign that says SIMPLE, saying &quot;I heard you want the good stuff...&quot;" />
+      <h1 class="landing-sub"><span class="highlight">What do you want to do?</span></h1>
+      <div class="landing-options">
+        <button class="landing-card" data-target="order">
+          <span class="landing-card-title">Order a meal</span>
+          <span class="landing-card-desc">Build one meal now</span>
+        </button>
+        <button class="landing-card" data-target="days">
+          <span class="landing-card-title">Automate a day or two</span>
+          <span class="landing-card-desc">Plan out your next couple of days</span>
+        </button>
+        <button class="landing-card" data-target="stack">
+          <span class="landing-card-title">Automate my whole meal stack</span>
+          <span class="landing-card-desc">Recurring meals, set and forget</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="view view-soon" id="viewSoon">
+      <button class="text-back" id="soonBack">&larr; Back</button>
+      <h2 class="screen-title" id="soonTitle">Coming soon</h2>
+      <p class="screen-hint" id="soonText"></p>
+    </section>
+
+    <section class="view view-builder" id="viewBuilder">
+    <header class="app-header">
+      <button class="text-back" id="builderBack">&larr; Start over</button>
+      <h1>Meal</h1>
+      <ol class="steps" id="steps">
+        <li data-step="1" class="active">Base</li>
+        <li data-step="2">Add-ons</li>
+        <li data-step="3">Sauce</li>
+        <li data-step="4">Review</li>
+      </ol>
+    </header>
+
+    <main class="panel">
+      <!-- Step 1: Base -->
+      <section class="screen active" data-screen="1">
+        <h2 class="screen-title">Choose your base</h2>
+        <p class="screen-hint">Pick one</p>
+        <div class="options" data-group="base" data-mode="single">
+          <button class="option" data-value="Rice & Chicken">
+            <span class="option-text">
+              <span class="option-name">Rice &amp; Chicken</span>
+              <span class="option-meta">150g chicken breast, 100g rice</span>
+            </span>
+          </button>
+          <button class="option" data-value="Beef & Sweet Potato">
+            <span class="option-text">
+              <span class="option-name">Beef &amp; Sweet Potato</span>
+              <span class="option-meta">200g lean beef, 1 big sweet potato</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: Add-ons -->
+      <section class="screen" data-screen="2">
+        <h2 class="screen-title">Add-ons</h2>
+        <p class="screen-hint">Pick any</p>
+        <div class="options" data-group="addons" data-mode="multi">
+          <button class="option" data-value="Eggs">
+            <span class="option-text">
+              <span class="option-name">Eggs</span>
+              <span class="option-meta">2 whole eggs</span>
+            </span>
+          </button>
+          <button class="option" data-value="Parmiggiano Block">
+            <span class="option-text">
+              <span class="option-name">Parmiggiano Block</span>
+              <span class="option-meta">30g</span>
+            </span>
+          </button>
+          <button class="option" data-value="Dates">
+            <span class="option-text">
+              <span class="option-name">Dates</span>
+              <span class="option-meta">2 pieces</span>
+            </span>
+          </button>
+          <button class="option" data-value="Broccoli">
+            <span class="option-text">
+              <span class="option-name">Broccoli</span>
+              <span class="option-meta">100g</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 3: Sauce -->
+      <section class="screen" data-screen="3">
+        <h2 class="screen-title">Sauce</h2>
+        <p class="screen-hint">Pick one</p>
+        <div class="options" data-group="sauce" data-mode="single">
+          <button class="option" data-value="Honey-Lime">
+            <span class="option-text">
+              <span class="option-name">Honey-Lime</span>
+              <span class="option-meta">1 lime juice, 2 tsp honey</span>
+            </span>
+          </button>
+          <button class="option" data-value="Guac">
+            <span class="option-text">
+              <span class="option-name">Guac</span>
+              <span class="option-meta">2 tbsp</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 4: Review -->
+      <section class="screen" data-screen="4">
+        <h2 class="screen-title">Your meal</h2>
+        <ul class="summary" id="summary"></ul>
+      </section>
+    </main>
+
+    <div class="macro-bar" id="macroBar">
+      <div class="macro-item">
+        <span class="macro-value" id="macroKcal">0</span>
+        <span class="macro-label">kcal</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-value" id="macroProtein">0g</span>
+        <span class="macro-label">protein</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-value" id="macroCarbs">0g</span>
+        <span class="macro-label">carbs</span>
+      </div>
+      <div class="macro-item">
+        <span class="macro-value" id="macroFat">0g</span>
+        <span class="macro-label">fat</span>
+      </div>
+    </div>
+
+    <footer class="nav">
+      <button class="btn btn-ghost" id="backBtn">Back</button>
+      <button class="btn btn-primary" id="nextBtn">Next</button>
+    </footer>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
