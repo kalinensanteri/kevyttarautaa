@@ -1,0 +1,9 @@
+{
+  "name": "kevyttarautaa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Meal ordering app with a Stripe Checkout backend running as a Cloudflare Pages Function.",
+  "dependencies": {
+    "stripe": "^16.8.0"
+  }
+}

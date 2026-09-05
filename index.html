@@ -2,153 +2,199 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Meal — Build Your Order</title>
+<title>Meal</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <section class="view view-landing active" id="viewLanding">
-      <img class="landing-mascot" src="gs.svg" alt="A guy in a trenchcoat holding a sign that says SIMPLE, saying &quot;I heard you want the good stuff...&quot;" />
-      <h1 class="landing-sub"><span class="highlight">What do you want to do?</span></h1>
-      <div class="landing-options">
-        <button class="landing-card" data-target="order">
-          <span class="landing-card-title">Order a meal</span>
-          <span class="landing-card-desc">Build one meal now</span>
+  <div id="page1">
+    <img src="gs.svg" alt="A guy in a trenchcoat holding a sign that says SIMPLE, saying &quot;I heard you want the good stuff...&quot;" />
+    <div class="button-row">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </div>
+  </div>
+
+  <div id="page2" class="hidden">
+    <h1>What should we get you?</h1>
+    <div class="portion">
+      <button class="simpleman-btn" data-type="simpleman1">SIMPLEMAN 1 — 722K, 62P 90C 15F</button>
+      <ul class="portion-list">
+        <li>Chicken Breast — 140g</li>
+        <li>Rice — 100g</li>
+        <li>Broccoli — 100g</li>
+        <li>Eggs — 2 pcs</li>
+        <li>Honey-Lime Sauce</li>
+      </ul>
+    </div>
+
+    <div class="portion">
+      <button class="simpleman-btn" data-type="simpleman2">SIMPLEMAN 2 — 756K, 61P 50C 38F</button>
+      <ul class="portion-list">
+        <li>Beef — 140g</li>
+        <li>Sweet Potato — 100g</li>
+        <li>Broccoli — 100g</li>
+        <li>Eggs — 2 pcs</li>
+        <li>Guacamole</li>
+      </ul>
+    </div>
+
+    <button id="createOwnBtn">CREATE YOUR OWN</button>
+  </div>
+
+  <div id="page3" class="hidden">
+    <h1>Where should we deliver?</h1>
+    <div class="options" data-group="location" data-mode="single">
+      <button class="option" data-value="Eira">Eira</button>
+      <button class="option" data-value="Vaiku Office">Vaiku Office</button>
+      <button class="option" data-value="Bahn Office">Bahn Office</button>
+    </div>
+    <input type="text" id="nameInput" placeholder="Your name" />
+    <button id="payBtn">Pay</button>
+  </div>
+
+  <div id="page4" class="hidden">
+    <h1>Create your own</h1>
+
+    <div class="option-section">
+      <h2>Protein</h2>
+      <div class="options" data-group="protein" data-mode="single">
+        <button class="option" data-value="Chicken 70g" data-kcal="116" data-protein="22" data-carbs="0" data-fat="3">
+          <span class="option-name">Chicken — 70g</span>
+          <span class="option-meta">116 kcal · 22P 0C 3F</span>
         </button>
-        <button class="landing-card" data-target="days">
-          <span class="landing-card-title">Automate a day or two</span>
-          <span class="landing-card-desc">Plan out your next couple of days</span>
+        <button class="option" data-value="Chicken 140g" data-kcal="231" data-protein="43" data-carbs="0" data-fat="5">
+          <span class="option-name">Chicken — 140g</span>
+          <span class="option-meta">231 kcal · 43P 0C 5F</span>
         </button>
-        <button class="landing-card" data-target="stack">
-          <span class="landing-card-title">Automate my whole meal stack</span>
-          <span class="landing-card-desc">Recurring meals, set and forget</span>
+        <button class="option" data-value="Chicken 210g" data-kcal="347" data-protein="65" data-carbs="0" data-fat="8">
+          <span class="option-name">Chicken — 210g</span>
+          <span class="option-meta">347 kcal · 65P 0C 8F</span>
         </button>
-      </div>
-    </section>
-
-    <section class="view view-soon" id="viewSoon">
-      <button class="text-back" id="soonBack">&larr; Back</button>
-      <h2 class="screen-title" id="soonTitle">Coming soon</h2>
-      <p class="screen-hint" id="soonText"></p>
-    </section>
-
-    <section class="view view-builder" id="viewBuilder">
-    <header class="app-header">
-      <button class="text-back" id="builderBack">&larr; Start over</button>
-      <h1>Meal</h1>
-      <ol class="steps" id="steps">
-        <li data-step="1" class="active">Base</li>
-        <li data-step="2">Add-ons</li>
-        <li data-step="3">Sauce</li>
-        <li data-step="4">Review</li>
-      </ol>
-    </header>
-
-    <main class="panel">
-      <!-- Step 1: Base -->
-      <section class="screen active" data-screen="1">
-        <h2 class="screen-title">Choose your base</h2>
-        <p class="screen-hint">Pick one</p>
-        <div class="options" data-group="base" data-mode="single">
-          <button class="option" data-value="Rice & Chicken">
-            <span class="option-text">
-              <span class="option-name">Rice &amp; Chicken</span>
-              <span class="option-meta">150g chicken breast, 100g rice</span>
-            </span>
-          </button>
-          <button class="option" data-value="Beef & Sweet Potato">
-            <span class="option-text">
-              <span class="option-name">Beef &amp; Sweet Potato</span>
-              <span class="option-meta">200g lean beef, 1 big sweet potato</span>
-            </span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Step 2: Add-ons -->
-      <section class="screen" data-screen="2">
-        <h2 class="screen-title">Add-ons</h2>
-        <p class="screen-hint">Pick any</p>
-        <div class="options" data-group="addons" data-mode="multi">
-          <button class="option" data-value="Eggs">
-            <span class="option-text">
-              <span class="option-name">Eggs</span>
-              <span class="option-meta">2 whole eggs</span>
-            </span>
-          </button>
-          <button class="option" data-value="Parmiggiano Block">
-            <span class="option-text">
-              <span class="option-name">Parmiggiano Block</span>
-              <span class="option-meta">30g</span>
-            </span>
-          </button>
-          <button class="option" data-value="Dates">
-            <span class="option-text">
-              <span class="option-name">Dates</span>
-              <span class="option-meta">2 pieces</span>
-            </span>
-          </button>
-          <button class="option" data-value="Broccoli">
-            <span class="option-text">
-              <span class="option-name">Broccoli</span>
-              <span class="option-meta">100g</span>
-            </span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Step 3: Sauce -->
-      <section class="screen" data-screen="3">
-        <h2 class="screen-title">Sauce</h2>
-        <p class="screen-hint">Pick one</p>
-        <div class="options" data-group="sauce" data-mode="single">
-          <button class="option" data-value="Honey-Lime">
-            <span class="option-text">
-              <span class="option-name">Honey-Lime</span>
-              <span class="option-meta">1 lime juice, 2 tsp honey</span>
-            </span>
-          </button>
-          <button class="option" data-value="Guac">
-            <span class="option-text">
-              <span class="option-name">Guac</span>
-              <span class="option-meta">2 tbsp</span>
-            </span>
-          </button>
-        </div>
-      </section>
-
-      <!-- Step 4: Review -->
-      <section class="screen" data-screen="4">
-        <h2 class="screen-title">Your meal</h2>
-        <ul class="summary" id="summary"></ul>
-      </section>
-    </main>
-
-    <div class="macro-bar" id="macroBar">
-      <div class="macro-item">
-        <span class="macro-value" id="macroKcal">0</span>
-        <span class="macro-label">kcal</span>
-      </div>
-      <div class="macro-item">
-        <span class="macro-value" id="macroProtein">0g</span>
-        <span class="macro-label">protein</span>
-      </div>
-      <div class="macro-item">
-        <span class="macro-value" id="macroCarbs">0g</span>
-        <span class="macro-label">carbs</span>
-      </div>
-      <div class="macro-item">
-        <span class="macro-value" id="macroFat">0g</span>
-        <span class="macro-label">fat</span>
+        <button class="option" data-value="Beef 70g" data-kcal="144" data-protein="20" data-carbs="0" data-fat="6">
+          <span class="option-name">Beef — 70g</span>
+          <span class="option-meta">144 kcal · 20P 0C 6F</span>
+        </button>
+        <button class="option" data-value="Beef 140g" data-kcal="287" data-protein="41" data-carbs="0" data-fat="13">
+          <span class="option-name">Beef — 140g</span>
+          <span class="option-meta">287 kcal · 41P 0C 13F</span>
+        </button>
+        <button class="option" data-value="Beef 210g" data-kcal="431" data-protein="61" data-carbs="0" data-fat="19">
+          <span class="option-name">Beef — 210g</span>
+          <span class="option-meta">431 kcal · 61P 0C 19F</span>
+        </button>
       </div>
     </div>
 
-    <footer class="nav">
-      <button class="btn btn-ghost" id="backBtn">Back</button>
-      <button class="btn btn-primary" id="nextBtn">Next</button>
-    </footer>
-    </section>
+    <div class="option-section">
+      <h2>Carbs</h2>
+      <div class="options" data-group="carb" data-mode="single">
+        <button class="option" data-value="Rice 100g" data-kcal="130" data-protein="3" data-carbs="28" data-fat="0">
+          <span class="option-name">Rice — 100g</span>
+          <span class="option-meta">130 kcal · 3P 28C 0F</span>
+        </button>
+        <button class="option" data-value="Rice 200g" data-kcal="260" data-protein="6" data-carbs="56" data-fat="0">
+          <span class="option-name">Rice — 200g</span>
+          <span class="option-meta">260 kcal · 6P 56C 0F</span>
+        </button>
+        <button class="option" data-value="Rice 300g" data-kcal="390" data-protein="9" data-carbs="84" data-fat="0">
+          <span class="option-name">Rice — 300g</span>
+          <span class="option-meta">390 kcal · 9P 84C 0F</span>
+        </button>
+        <button class="option" data-value="Sweet Potato 100g" data-kcal="90" data-protein="2" data-carbs="21" data-fat="0">
+          <span class="option-name">Sweet Potato — 100g</span>
+          <span class="option-meta">90 kcal · 2P 21C 0F</span>
+        </button>
+        <button class="option" data-value="Sweet Potato 200g" data-kcal="180" data-protein="4" data-carbs="42" data-fat="0">
+          <span class="option-name">Sweet Potato — 200g</span>
+          <span class="option-meta">180 kcal · 4P 42C 0F</span>
+        </button>
+        <button class="option" data-value="Sweet Potato 300g" data-kcal="270" data-protein="6" data-carbs="63" data-fat="0">
+          <span class="option-name">Sweet Potato — 300g</span>
+          <span class="option-meta">270 kcal · 6P 63C 0F</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="option-section">
+      <h2>Add-ons</h2>
+      <div class="options" data-group="addons" data-mode="multi">
+        <button class="option" data-value="Eggs 1" data-kcal="72" data-protein="7" data-carbs="1" data-fat="5">
+          <span class="option-name">Eggs — 1 pc</span>
+          <span class="option-meta">72 kcal · 7P 1C 5F</span>
+        </button>
+        <button class="option" data-value="Eggs 2" data-kcal="144" data-protein="13" data-carbs="1" data-fat="10">
+          <span class="option-name">Eggs — 2 pcs</span>
+          <span class="option-meta">144 kcal · 13P 1C 10F</span>
+        </button>
+        <button class="option" data-value="Eggs 3" data-kcal="216" data-protein="20" data-carbs="2" data-fat="15">
+          <span class="option-name">Eggs — 3 pcs</span>
+          <span class="option-meta">216 kcal · 20P 2C 15F</span>
+        </button>
+        <button class="option" data-value="Eggs 4" data-kcal="288" data-protein="26" data-carbs="2" data-fat="20">
+          <span class="option-name">Eggs — 4 pcs</span>
+          <span class="option-meta">288 kcal · 26P 2C 20F</span>
+        </button>
+        <button class="option" data-value="Eggs 5" data-kcal="360" data-protein="33" data-carbs="3" data-fat="25">
+          <span class="option-name">Eggs — 5 pcs</span>
+          <span class="option-meta">360 kcal · 33P 3C 25F</span>
+        </button>
+        <button class="option" data-value="Eggs 6" data-kcal="432" data-protein="39" data-carbs="3" data-fat="30">
+          <span class="option-name">Eggs — 6 pcs</span>
+          <span class="option-meta">432 kcal · 39P 3C 30F</span>
+        </button>
+        <button class="option" data-value="Eggs 7" data-kcal="504" data-protein="46" data-carbs="4" data-fat="35">
+          <span class="option-name">Eggs — 7 pcs</span>
+          <span class="option-meta">504 kcal · 46P 4C 35F</span>
+        </button>
+        <button class="option" data-value="Eggs 8" data-kcal="576" data-protein="52" data-carbs="4" data-fat="40">
+          <span class="option-name">Eggs — 8 pcs</span>
+          <span class="option-meta">576 kcal · 52P 4C 40F</span>
+        </button>
+        <button class="option" data-value="Eggs 9" data-kcal="648" data-protein="59" data-carbs="5" data-fat="45">
+          <span class="option-name">Eggs — 9 pcs</span>
+          <span class="option-meta">648 kcal · 59P 5C 45F</span>
+        </button>
+        <button class="option" data-value="Eggs 10" data-kcal="720" data-protein="65" data-carbs="5" data-fat="50">
+          <span class="option-name">Eggs — 10 pcs</span>
+          <span class="option-meta">720 kcal · 65P 5C 50F</span>
+        </button>
+        <button class="option" data-value="Broccoli 100g" data-kcal="35" data-protein="2" data-carbs="7" data-fat="0">
+          <span class="option-name">Broccoli — 100g</span>
+          <span class="option-meta">35 kcal · 2P 7C 0F</span>
+        </button>
+        <button class="option" data-value="Broccoli 150g" data-kcal="53" data-protein="3" data-carbs="11" data-fat="0">
+          <span class="option-name">Broccoli — 150g</span>
+          <span class="option-meta">53 kcal · 3P 11C 0F</span>
+        </button>
+        <button class="option" data-value="Broccoli 200g" data-kcal="70" data-protein="4" data-carbs="14" data-fat="0">
+          <span class="option-name">Broccoli — 200g</span>
+          <span class="option-meta">70 kcal · 4P 14C 0F</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="option-section">
+      <h2>Sauces</h2>
+      <div class="options" data-group="sauce" data-mode="single">
+        <button class="option" data-value="Honey-Lime Sauce" data-kcal="182" data-protein="1" data-carbs="54" data-fat="0">
+          <span class="option-name">Honey-Lime Sauce</span>
+          <span class="option-meta">182 kcal · 1P 54C 0F</span>
+        </button>
+        <button class="option" data-value="Guacamole" data-kcal="200" data-protein="3" data-carbs="21" data-fat="15">
+          <span class="option-name">Guacamole</span>
+          <span class="option-meta">200 kcal · 3P 21C 15F</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="macro-total">
+      <span id="totalKcal">0</span> kcal ·
+      <span id="totalProtein">0</span>P
+      <span id="totalCarbs">0</span>C
+      <span id="totalFat">0</span>F
+    </div>
+
+    <button id="createOwnNextBtn">Next</button>
   </div>
 
   <script src="script.js"></script>
